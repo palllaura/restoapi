@@ -25,4 +25,17 @@ public class DiningTable {
      */
     private int seats;
 
+    /**
+     * No-args constructor.
+     */
+    public DiningTable() {
+    }
+
+    /**
+     * Dining table constructor with number of seats.
+     * @param seats number of seats.
+     */
+    public DiningTable(int seats) {
+        this.seats = seats;
+    }
 }
