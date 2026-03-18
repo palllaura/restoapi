@@ -14,8 +14,8 @@ import java.util.List;
 @Configuration
 public class DataInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataInitializer.class);
-    private static final int NUM_OF_TABLES_WITH_2_SEATS = 1;
-    private static final int NUM_OF_TABLES_WITH_4_SEATS = 1;
+    private static final int NUM_OF_TABLES_WITH_2_SEATS = 3;
+    private static final int NUM_OF_TABLES_WITH_4_SEATS = 2;
     private static final int NUM_OF_TABLES_WITH_6_SEATS = 1;
 
 
