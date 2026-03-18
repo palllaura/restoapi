@@ -3,7 +3,7 @@ const TABLE_HEIGHT_SMALL = 120;
 const TABLE_HEIGHT_LARGE = 240;
 const CHAIR_SIZE = 50;
 
-export function drawTable(ctx, x, y, seats) {
+export function drawTable(ctx, x, y, seats, status) {
     ctx.fillStyle = "#d5cdc3";
 
     const tableHeight =
