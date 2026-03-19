@@ -23,33 +23,66 @@ public class ReservationDataGenerator {
 
         for (DiningTable table : tables) {
 
+            List<Reservation> tableReservations = new ArrayList<>();
             int numReservations = random.nextInt(3);
 
             for (int i = 0; i < numReservations; i++) {
 
-                int hour = 10 + random.nextInt(12);
+                int attempts = 0;
+                boolean created = false;
 
-                LocalDateTime start = LocalDateTime.now()
-                        .plusDays(random.nextInt(3))
-                        .withHour(hour)
-                        .withMinute(0)
-                        .withSecond(0)
-                        .withNano(0);
+                while (attempts < 10 && !created) {
 
-                int durationHours = 1 + random.nextInt(3);
-                LocalDateTime end = start.plusHours(durationHours);
+                    int hour = 10 + random.nextInt(12);
 
-                Reservation reservation = new Reservation();
-                reservation.setTable(table);
-                reservation.setStartTime(start);
-                reservation.setEndTime(end);
-                reservation.setCustomerName("Customer Name");
-                reservation.setPartySize(table.getSeats());
+                    LocalDateTime start = LocalDateTime.now()
+                            .plusDays(random.nextInt(3))
+                            .withHour(hour)
+                            .withMinute(0)
+                            .withSecond(0)
+                            .withNano(0);
 
-                reservations.add(reservation);
+                    int durationHours = 1 + random.nextInt(3);
+                    LocalDateTime end = start.plusHours(durationHours);
+
+                    boolean overlaps = tableReservations.stream()
+                            .anyMatch(r -> isOverlapping(start, end, r));
+
+                    if (!overlaps) {
+                        Reservation reservation = new Reservation();
+                        reservation.setTable(table);
+                        reservation.setStartTime(start);
+                        reservation.setEndTime(end);
+                        reservation.setCustomerName("Customer Name");
+                        reservation.setPartySize(table.getSeats());
+
+                        tableReservations.add(reservation);
+                        reservations.add(reservation);
+
+                        created = true;
+                    }
+
+                    attempts++;
+                }
             }
         }
 
         return reservations;
+    }
+
+    /**
+     * Helper method to check if chosen time overlaps with already existing reservation.
+     * @param start start time.
+     * @param end end time.
+     * @param existing existing reservation.
+     * @return true if overlaps, else false.
+     */
+    private boolean isOverlapping(
+            LocalDateTime start,
+            LocalDateTime end,
+            Reservation existing
+    ) {
+        return start.isBefore(existing.getEndTime()) &&
+                existing.getStartTime().isBefore(end);
     }
 }
