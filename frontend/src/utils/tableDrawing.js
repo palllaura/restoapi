@@ -4,7 +4,20 @@ const TABLE_HEIGHT_LARGE = 240;
 const CHAIR_SIZE = 50;
 
 export function drawTable(ctx, x, y, seats, status) {
-    ctx.fillStyle = "#d5cdc3";
+    const tableColor =
+        status === "OCCUPIED"
+            ? "#ffffff"
+            : status === "RECOMMENDED"
+                ? "#d9edbb"
+                : "#eae6e1";
+
+    const strokeColor =
+        status === "OCCUPIED"
+            ? "#d5d5d5"
+                : "#090909";
+
+    ctx.fillStyle = tableColor;
+    ctx.strokeStyle = strokeColor;
 
     const tableHeight =
         seats === 6 ? TABLE_HEIGHT_LARGE : TABLE_HEIGHT_SMALL;
@@ -69,7 +82,6 @@ export function drawTable(ctx, x, y, seats, status) {
 
     ctx.beginPath();
     ctx.rect(x, y, TABLE_WIDTH, tableHeight);
-    ctx.fillStyle = "#eae6e1";
     ctx.fill();
     ctx.stroke();
 }
