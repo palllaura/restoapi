@@ -1,8 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { drawTable } from "../utils/tableDrawing";
 
 function FloorPlan() {
     const canvasRef = useRef(null);
+
+    const [tables, setTables] = useState([]);
+    const [selectedTableId, setSelectedTableId] = useState(null);
 
     const tableLayout = {
         1: { x: 50, y: 450 },
@@ -14,9 +17,6 @@ function FloorPlan() {
     };
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-
         fetch("http://localhost:8080/tables")
             .then(res => res.json())
             .then(data => {
@@ -27,14 +27,36 @@ function FloorPlan() {
                     }))
                     .filter(t => t.x !== undefined && t.y !== undefined);
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                setTables(tablesWithLayout);
 
-                tablesWithLayout.forEach(t =>
-                    drawTable(ctx, t.x, t.y, t.seats, t.status)
+                const recommended = tablesWithLayout.find(
+                    t => t.status === "RECOMMENDED"
                 );
+
+                if (recommended) {
+                    setSelectedTableId(recommended.id);
+                } else if (tablesWithLayout.length > 0) {
+                    setSelectedTableId(tablesWithLayout[0].id);
+                }
             })
             .catch(err => console.error("Failed to fetch tables:", err));
     }, []);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        tables.forEach(t => {
+            const status =
+                t.id === selectedTableId
+                    ? "RECOMMENDED"
+                    : t.status;
+
+            drawTable(ctx, t.x, t.y, t.seats, status);
+        });
+    }, [tables, selectedTableId]);
 
     return (
         <div
