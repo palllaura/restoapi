@@ -1,7 +1,9 @@
-const TABLE_WIDTH = 120;
-const TABLE_HEIGHT_SMALL = 120;
-const TABLE_HEIGHT_LARGE = 240;
-const CHAIR_SIZE = 50;
+import {
+    TABLE_WIDTH,
+    TABLE_HEIGHT_SMALL,
+    TABLE_HEIGHT_LARGE,
+    CHAIR_SIZE
+} from "./tableConstants";
 
 export function drawTable(ctx, x, y, seats, status) {
     const tableColor =
@@ -14,7 +16,7 @@ export function drawTable(ctx, x, y, seats, status) {
     const strokeColor =
         status === "OCCUPIED"
             ? "#d5d5d5"
-                : "#090909";
+            : "#090909";
 
     ctx.fillStyle = tableColor;
     ctx.strokeStyle = strokeColor;

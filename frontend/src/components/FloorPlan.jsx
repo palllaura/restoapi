@@ -1,5 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { drawTable } from "../utils/tableDrawing";
+import {useEffect, useRef, useState} from "react";
+import {drawTable} from "../utils/tableDrawing";
+
+import {
+    TABLE_WIDTH,
+    TABLE_HEIGHT_SMALL,
+    TABLE_HEIGHT_LARGE
+} from "../utils/tableConstants";
 
 function FloorPlan() {
     const canvasRef = useRef(null);
@@ -8,12 +14,12 @@ function FloorPlan() {
     const [selectedTableId, setSelectedTableId] = useState(null);
 
     const tableLayout = {
-        1: { x: 50, y: 450 },
-        2: { x: 300, y: 450 },
-        3: { x: 600, y: 450 },
-        4: { x: 50, y: 50 },
-        5: { x: 300, y: 50 },
-        6: { x: 600, y: 50 },
+        1: {x: 50, y: 450},
+        2: {x: 300, y: 450},
+        3: {x: 600, y: 450},
+        4: {x: 50, y: 50},
+        5: {x: 300, y: 50},
+        6: {x: 600, y: 50},
     };
 
     useEffect(() => {
@@ -49,14 +55,36 @@ function FloorPlan() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         tables.forEach(t => {
-            const status =
-                t.id === selectedTableId
-                    ? "RECOMMENDED"
-                    : t.status;
+            const resolvedStatus = resolveTableStatus(t, selectedTableId);
 
-            drawTable(ctx, t.x, t.y, t.seats, status);
+            drawTable(ctx, t.x, t.y, t.seats, resolvedStatus);
         });
     }, [tables, selectedTableId]);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+
+        const handleClick = (event) => {
+            const rect = canvas.getBoundingClientRect();
+
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+
+            const clickedTable = tables.find(t =>
+                isPointInsideTable(clickX, clickY, t)
+            );
+
+            if (clickedTable && clickedTable.status !== "OCCUPIED") {
+                setSelectedTableId(clickedTable.id);
+            }
+        };
+
+        canvas.addEventListener("click", handleClick);
+
+        return () => {
+            canvas.removeEventListener("click", handleClick);
+        };
+    }, [tables]);
 
     return (
         <div
@@ -78,6 +106,26 @@ function FloorPlan() {
                 }}
             />
         </div>
+    );
+}
+
+function resolveTableStatus(table, selectedTableId) {
+    if (table.id === selectedTableId) return "RECOMMENDED";
+    if (table.status === "RECOMMENDED") return "FREE";
+    return table.status;
+}
+
+function isPointInsideTable(px, py, table) {
+    const tableHeight =
+        table.seats === 6
+            ? TABLE_HEIGHT_LARGE
+            : TABLE_HEIGHT_SMALL;
+
+    return (
+        px >= table.x &&
+        px <= table.x + TABLE_WIDTH &&
+        py >= table.y &&
+        py <= table.y + tableHeight
     );
 }
 
