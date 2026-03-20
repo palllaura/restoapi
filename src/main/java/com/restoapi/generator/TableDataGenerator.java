@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.restoapi.constants.TableConstants.NUM_OF_TABLES_WITH_2_SEATS;
+import static com.restoapi.constants.TableConstants.NUM_OF_TABLES_WITH_4_SEATS;
+import static com.restoapi.constants.TableConstants.NUM_OF_TABLES_WITH_6_SEATS;
+
 @Component
 public class TableDataGenerator {
-
-    private static final int NUM_OF_TABLES_WITH_2_SEATS = 3;
-    private static final int NUM_OF_TABLES_WITH_4_SEATS = 2;
-    private static final int NUM_OF_TABLES_WITH_6_SEATS = 1;
 
     /**
      * Generates tables according to set quantities.

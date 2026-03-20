@@ -1,5 +1,6 @@
 package com.restoapi.generator;
 
+import com.restoapi.constants.ReservationConstants;
 import com.restoapi.entity.DiningTable;
 import com.restoapi.entity.Reservation;
 import org.springframework.stereotype.Component;
@@ -24,25 +25,38 @@ public class ReservationDataGenerator {
         for (DiningTable table : tables) {
 
             List<Reservation> tableReservations = new ArrayList<>();
-            int numReservations = random.nextInt(3);
+
+            int numReservations = random.nextInt(
+                    ReservationConstants.MAX_RESERVATIONS_PER_TABLE + 1
+            );
 
             for (int i = 0; i < numReservations; i++) {
 
                 int attempts = 0;
                 boolean created = false;
 
-                while (attempts < 10 && !created) {
+                while (attempts < ReservationConstants.MAX_GENERATION_ATTEMPTS && !created) {
 
-                    int hour = 10 + random.nextInt(12);
+                    int hour = ReservationConstants.OPENING_HOUR +
+                            random.nextInt(
+                                    ReservationConstants.CLOSING_HOUR
+                                            - ReservationConstants.OPENING_HOUR
+                            );
 
                     LocalDateTime start = LocalDateTime.now()
-                            .plusDays(random.nextInt(3))
+                            .plusDays(random.nextInt(ReservationConstants.MAX_DAYS_IN_FUTURE))
                             .withHour(hour)
                             .withMinute(0)
                             .withSecond(0)
                             .withNano(0);
 
-                    int durationHours = 1 + random.nextInt(3);
+                    int durationHours =
+                            ReservationConstants.MIN_RESERVATION_DURATION_HOURS +
+                                    random.nextInt(
+                                            ReservationConstants.MAX_RESERVATION_DURATION_HOURS
+                                                    - ReservationConstants.MIN_RESERVATION_DURATION_HOURS + 1
+                                    );
+
                     LocalDateTime end = start.plusHours(durationHours);
 
                     boolean overlaps = tableReservations.stream()
@@ -72,10 +86,6 @@ public class ReservationDataGenerator {
 
     /**
      * Helper method to check if chosen time overlaps with already existing reservation.
-     * @param start start time.
-     * @param end end time.
-     * @param existing existing reservation.
-     * @return true if overlaps, else false.
      */
     private boolean isOverlapping(
             LocalDateTime start,
