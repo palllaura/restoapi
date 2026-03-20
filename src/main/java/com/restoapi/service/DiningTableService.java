@@ -13,14 +13,16 @@ import java.util.List;
 @Service
 public class DiningTableService {
     private final DiningTableRepository tableRepository;
+    private final ReservationService reservationService;
 
     /**
      * Dining table service constructor.
      *
      * @param tableRepository DiningTableRepository.
      */
-    public DiningTableService(DiningTableRepository tableRepository) {
+    public DiningTableService(DiningTableRepository tableRepository, ReservationService reservationService) {
         this.tableRepository = tableRepository;
+        this.reservationService = reservationService;
     }
 
     /**
@@ -60,15 +62,20 @@ public class DiningTableService {
 
     /**
      * Determines table status.
-     * Currently, returns FREE for all tables.
-     * Next step: integrate reservation logic.
      */
     private TableStatus resolveStatus(
             DiningTable table,
             LocalDateTime start,
             LocalDateTime end
     ) {
-        // TODO: check reservations here
-        return TableStatus.FREE;
+        boolean available = reservationService.isTableAvailable(
+                table,
+                start,
+                end
+        );
+
+        return available
+                ? TableStatus.FREE
+                : TableStatus.OCCUPIED;
     }
 }
