@@ -23,7 +23,7 @@ function FloorPlan() {
     };
 
     useEffect(() => {
-        fetch("http://localhost:8080/tables")
+        fetch("http://localhost:8080/api/tables")
             .then(res => res.json())
             .then(data => {
                 const tablesWithLayout = data

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tables")
+@RequestMapping("/api")
 public class DiningTableController {
 
     private final DiningTableService tableService;

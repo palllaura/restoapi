@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/reservations")
+@RequestMapping("/api")
 public class ReservationController {
 
     private final ReservationService reservationService;
