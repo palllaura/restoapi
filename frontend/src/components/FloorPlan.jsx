@@ -1,6 +1,8 @@
 import {useEffect, useRef, useState} from "react";
 import {drawTable} from "../utils/tableDrawing";
 
+import {getTables} from "../api/tableApi";
+
 import {
     TABLE_WIDTH,
     TABLE_HEIGHT_SMALL,
@@ -23,8 +25,7 @@ function FloorPlan() {
     };
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/tables")
-            .then(res => res.json())
+        getTables()
             .then(data => {
                 const tablesWithLayout = data
                     .map(t => ({
