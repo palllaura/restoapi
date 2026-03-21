@@ -9,7 +9,7 @@ import {
     TABLE_HEIGHT_LARGE
 } from "../utils/tableConstants";
 
-function FloorPlan() {
+function FloorPlan({ guests }) {
     const canvasRef = useRef(null);
 
     const [tables, setTables] = useState([]);
@@ -25,7 +25,7 @@ function FloorPlan() {
     };
 
     useEffect(() => {
-        getTables()
+        getTables({guests})
             .then(data => {
                 const tablesWithLayout = data
                     .map(t => ({
@@ -53,7 +53,7 @@ function FloorPlan() {
                 }
             })
             .catch(err => console.error("Failed to fetch tables:", err));
-    }, []);
+    }, [guests]);
 
     useEffect(() => {
         const canvas = canvasRef.current;

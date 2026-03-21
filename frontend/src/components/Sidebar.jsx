@@ -1,6 +1,15 @@
 import logo from "../assets/logo.png";
 
-function Sidebar() {
+function Sidebar({ guests, setGuests}) {
+
+    const increaseGuests = () => {
+        setGuests(prev => prev + 1);
+    };
+
+    const decreaseGuests = () => {
+        setGuests(prev => Math.max(1, prev - 1));
+    };
+
     return (
         <div
             style={{
@@ -19,10 +28,11 @@ function Sidebar() {
                 <input type="date" />
 
                 <p style={{ marginTop: "20px" }}>külastajate arv</p>
+
                 <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                    <button>-</button>
-                    <span>4</span>
-                    <button>+</button>
+                    <button onClick={decreaseGuests} disabled={guests === 1}>-</button>
+                    <span>{guests}</span>
+                    <button onClick={increaseGuests} disabled={guests === 6}>+</button>
                 </div>
 
                 <button style={{ marginTop: "30px", width: "100%" }}>
