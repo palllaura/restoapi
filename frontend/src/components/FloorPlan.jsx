@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { drawTable } from "../utils/tableDrawing";
 import { getTables } from "../api/tableApi";
+import "../index.css";
 
 import {
     TABLE_WIDTH,
@@ -108,23 +109,11 @@ function FloorPlan({ guests, date, hour, duration, selectedTableId, setSelectedT
     }, [tables]);
 
     return (
-        <div
-            style={{
-                flex: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "#f5f5f5",
-            }}
-        >
-            <canvas
+        <div className="floorplan">
+            <canvas className="canvas"
                 ref={canvasRef}
                 width={800}
                 height={600}
-                style={{
-                    border: "2px solid black",
-                    backgroundColor: "white",
-                }}
             />
         </div>
     );

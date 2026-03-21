@@ -1,6 +1,7 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
-import {createReservation} from "../api/reservationApi";
+import { createReservation } from "../api/reservationApi";
+import "../index.css";
 
 function Sidebar({
                      guests,
@@ -14,7 +15,6 @@ function Sidebar({
                      selectedTableId,
                      onReservationSuccess
                  }) {
-
     const [name, setName] = useState("");
     const [message, setMessage] = useState(null);
 
@@ -23,7 +23,6 @@ function Sidebar({
 
     const MIN_DURATION = 1;
     const MAX_DURATION = 3;
-
     const MAX_DAYS_IN_FUTURE = 3;
 
     const today = new Date().toISOString().split("T")[0];
@@ -39,13 +38,8 @@ function Sidebar({
         setHour(value === "" ? "" : Number(value));
     };
 
-    const increaseGuests = () => {
-        setGuests(prev => prev + 1);
-    };
-
-    const decreaseGuests = () => {
-        setGuests(prev => Math.max(1, prev - 1));
-    };
+    const increaseGuests = () => setGuests(g => Math.min(6, g + 1));
+    const decreaseGuests = () => setGuests(g => Math.max(1, g - 1));
 
     const maxDuration = hour
         ? Math.min(MAX_DURATION, CLOSING_HOUR - hour)
@@ -55,7 +49,7 @@ function Sidebar({
         setMessage(null);
 
         if (!selectedTableId || !date || hour === "" || !name.trim()) {
-            setMessage("Palun täida kõik väljad");
+            setMessage({ text: "Palun täida kõik väljad", type: "error" });
             return;
         }
 
@@ -73,13 +67,14 @@ function Sidebar({
             customerName: name,
         })
             .then(res => {
-                setMessage(res.message);
+                setMessage({ text: res.message, type: res.success ? "success" : "error" });
+
                 if (res.success) {
                     onReservationSuccess();
                 }
             })
             .catch(() => {
-                setMessage("Midagi läks valesti");
+                setMessage({ text: "Midagi läks valesti", type: "error" });
             });
     }
 
@@ -94,22 +89,15 @@ function Sidebar({
     }, [hour]);
 
     return (
-        <div
-            style={{
-                width: "250px",
-                backgroundColor: "#eae6e1",
-                padding: "20px",
-                boxSizing: "border-box",
-            }}
-        >
-            <div style={{marginBottom: "40px"}}>
-                <img src={logo} alt="logo" style={{width: "100%"}}/>
+        <aside className="sidebar">
+            <div className="sidebar__logo">
+                <img src={logo} alt="logo" />
             </div>
 
-            <div>
-                <p style={{marginTop: "20px"}}>Kuupäev ja kellaaeg</p>
+            <div className="sidebar__section">
+                <label>Kuupäev ja kellaaeg</label>
 
-                <div style={{display: "flex", gap: "10px"}}>
+                <div className="row">
                     <input
                         type="date"
                         value={date}
@@ -122,75 +110,74 @@ function Sidebar({
                         <option value="">vali aeg</option>
                         {[...Array(CLOSING_HOUR - OPENING_HOUR)].map((_, i) => {
                             const h = OPENING_HOUR + i;
-                            return (
-                                <option key={h} value={h}>
-                                    {h}:00
-                                </option>
-                            );
+                            return <option key={h} value={h}>{h}:00</option>;
                         })}
                     </select>
                 </div>
+            </div>
 
-                <p style={{marginTop: "20px"}}>Külastuse kestus</p>
-
-                <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
+            <div className="sidebar__section">
+                <label>Kestus</label>
+                <div className="counter">
                     <button
+                        className="mini-btn"
                         onClick={() => setDuration(d => Math.max(MIN_DURATION, d - 1))}
                         disabled={duration === MIN_DURATION}
-                    >
-                        -
-                    </button>
+                    >-</button>
 
                     <span>{duration}h</span>
 
                     <button
+                        className="mini-btn"
                         onClick={() => setDuration(d => Math.min(maxDuration, d + 1))}
                         disabled={duration >= maxDuration}
-                    >
-                        +
-                    </button>
+                    >+</button>
                 </div>
+            </div>
 
-                <p style={{marginTop: "20px"}}>Külastajate arv</p>
-
-                <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
-                    <button onClick={decreaseGuests} disabled={guests === 1}>
-                        -
-                    </button>
+            <div className="sidebar__section">
+                <label>Külastajad</label>
+                <div className="counter">
+                    <button
+                        className="mini-btn"
+                        onClick={decreaseGuests}
+                        disabled={guests === 1}
+                    >-</button>
 
                     <span>{guests}</span>
 
-                    <button onClick={increaseGuests} disabled={guests === 6}>
-                        +
-                    </button>
+                    <button
+                        className="mini-btn"
+                        onClick={increaseGuests}
+                        disabled={guests === 6}
+                    >+</button>
                 </div>
-
-                <div>
-                    <p style={{marginTop: "20px"}}>Nimi</p>
-                    <input
-                        type="text"
-                        value={name}
-                        placeholder="..."
-                        onChange={e => setName(e.target.value)}
-                        style={{width: "100%"}}
-                    />
-                </div>
-
-                <button
-                    style={{marginTop: "30px", width: "100%"}}
-                    onClick={handleReserve}
-                    disabled={!selectedTableId}
-                >
-                    Reserveeri
-                </button>
-
-                {message && (
-                    <p style={{marginTop: "15px"}}>
-                        {message}
-                    </p>
-                )}
             </div>
-        </div>
+
+            <div className="sidebar__section">
+                <label>Nimi</label>
+                <input
+                    type="text"
+                    value={name}
+                    placeholder="Sisesta nimi"
+                    onChange={e => setName(e.target.value)}
+                />
+            </div>
+
+            <button
+                className="primary-btn"
+                onClick={handleReserve}
+                disabled={!selectedTableId}
+            >
+                Reserveeri
+            </button>
+
+            {message && (
+                <div className={`message ${message.type}`}>
+                    {message.text}
+                </div>
+            )}
+        </aside>
     );
 }
 
