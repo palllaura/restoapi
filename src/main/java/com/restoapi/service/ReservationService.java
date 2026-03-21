@@ -1,7 +1,9 @@
 package com.restoapi.service;
 
+import com.restoapi.dto.CreateReservationRequest;
 import com.restoapi.entity.DiningTable;
 import com.restoapi.entity.Reservation;
+import com.restoapi.repository.DiningTableRepository;
 import com.restoapi.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +14,16 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final DiningTableRepository tableRepository;
 
     /**
      * Reservation service constructor.
      *
      * @param repository ReservationRepository.
      */
-    public ReservationService(ReservationRepository repository) {
+    public ReservationService(ReservationRepository repository, DiningTableRepository tableRepository) {
         this.reservationRepository = repository;
+        this.tableRepository = tableRepository;
     }
 
     /**
@@ -55,6 +59,35 @@ public class ReservationService {
     ) {
         return start.isBefore(existing.getEndTime()) &&
                 existing.getStartTime().isBefore(end);
+    }
+
+    /**
+     * Create reservation for table if table is available.
+     * @param request DTO with request data.
+     */
+    public void createReservation(CreateReservationRequest request) {
+
+        DiningTable table = tableRepository.findById(request.tableId())
+                .orElseThrow(() -> new RuntimeException("Table not found"));
+
+        boolean available = isTableAvailable(
+                table,
+                request.start(),
+                request.end()
+        );
+
+        if (!available) {
+            throw new RuntimeException("Table is not available");
+        }
+
+        Reservation reservation = new Reservation();
+        reservation.setTable(table);
+        reservation.setStartTime(request.start());
+        reservation.setEndTime(request.end());
+        reservation.setPartySize(request.guests());
+        reservation.setCustomerName(request.customerName());
+
+        reservationRepository.save(reservation);
     }
 
 }
