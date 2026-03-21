@@ -15,6 +15,7 @@ function Sidebar({
                  }) {
 
     const [name, setName] = useState("");
+    const [message, setMessage] = useState(null);
 
     const OPENING_HOUR = 10;
     const CLOSING_HOUR = 22;
@@ -50,8 +51,10 @@ function Sidebar({
         : MAX_DURATION;
 
     function handleReserve() {
+        setMessage(null);
+
         if (!selectedTableId || !date || hour === "" || !name.trim()) {
-            alert("Palun täida kõik väljad");
+            setMessage("Palun täida kõik väljad");
             return;
         }
 
@@ -68,14 +71,17 @@ function Sidebar({
             guests,
             customerName: name,
         })
-            .then(() => {
-                alert("Broneering tehtud!");
-                setName("");
+            .then(res => {
+                setMessage(res.message);
             })
             .catch(() => {
-                alert("Broneerimine ebaõnnestus");
+                setMessage("Midagi läks valesti");
             });
     }
+
+    useEffect(() => {
+        setMessage(null);
+    }, [guests, date, hour, duration, name, selectedTableId]);
 
     useEffect(() => {
         if (hour && duration > (CLOSING_HOUR - hour)) {
@@ -173,6 +179,12 @@ function Sidebar({
                 >
                     Reserveeri
                 </button>
+
+                {message && (
+                    <p style={{ marginTop: "15px" }}>
+                        {message}
+                    </p>
+                )}
             </div>
         </div>
     );

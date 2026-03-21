@@ -1,6 +1,7 @@
 package com.restoapi.service;
 
 import com.restoapi.dto.CreateReservationRequest;
+import com.restoapi.dto.ReservationResponse;
 import com.restoapi.entity.DiningTable;
 import com.restoapi.entity.Reservation;
 import com.restoapi.repository.DiningTableRepository;
@@ -64,11 +65,16 @@ public class ReservationService {
     /**
      * Create reservation for table if table is available.
      * @param request DTO with request data.
+     * @return reservation response.
      */
-    public void createReservation(CreateReservationRequest request) {
+    public ReservationResponse createReservation(CreateReservationRequest request) {
 
         DiningTable table = tableRepository.findById(request.tableId())
-                .orElseThrow(() -> new RuntimeException("Table not found"));
+                .orElse(null);
+
+        if (table == null) {
+            return new ReservationResponse(false, "Lauda ei leitud");
+        }
 
         boolean available = isTableAvailable(
                 table,
@@ -77,7 +83,7 @@ public class ReservationService {
         );
 
         if (!available) {
-            throw new RuntimeException("Table is not available");
+            return new ReservationResponse(false, "Laud ei ole saadaval valitud ajal");
         }
 
         Reservation reservation = new Reservation();
@@ -88,6 +94,8 @@ public class ReservationService {
         reservation.setCustomerName(request.customerName());
 
         reservationRepository.save(reservation);
+
+        return new ReservationResponse(true, "Broneering õnnestus");
     }
 
 }

@@ -1,6 +1,7 @@
 package com.restoapi.controller;
 
 import com.restoapi.dto.CreateReservationRequest;
+import com.restoapi.dto.ReservationResponse;
 import com.restoapi.service.ReservationService;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +26,10 @@ public class ReservationController {
      * @param request Reservation request.
      */
     @PostMapping("/reservations")
-    public void createReservation(@RequestBody CreateReservationRequest request) {
-        reservationService.createReservation(request);
+    public ReservationResponse createReservation(
+            @RequestBody CreateReservationRequest request
+    ) {
+        return reservationService.createReservation(request);
     }
 
 }
