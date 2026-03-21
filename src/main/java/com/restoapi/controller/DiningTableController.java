@@ -2,6 +2,7 @@ package com.restoapi.controller;
 
 import com.restoapi.dto.TableDto;
 import com.restoapi.service.DiningTableService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -29,9 +30,16 @@ public class DiningTableController {
      */
     @GetMapping("/tables")
     public List<TableDto> getTables(
-            @RequestParam(required = false) LocalDateTime start,
-            @RequestParam(required = false) LocalDateTime end,
-            @RequestParam(required = false) Integer guests
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime start,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime end,
+
+            @RequestParam(required = false)
+            Integer guests
     ) {
         return tableService.getTables(start, end, guests);
     }

@@ -5,11 +5,28 @@ import FloorPlan from "./components/FloorPlan";
 function App() {
 
     const [guests, setGuests] = useState(2);
+    const [date, setDate] = useState("");
+    const [hour, setHour] = useState("");
+    const [duration, setDuration] = useState(2);
 
     return (
         <div style={{ display: "flex", height: "100vh" }}>
-            <Sidebar guests={guests} setGuests={setGuests} />
-            <FloorPlan guests={guests} />
+            <Sidebar
+                guests={guests}
+                setGuests={setGuests}
+                date={date}
+                setDate={setDate}
+                hour={hour}
+                setHour={setHour}
+                duration={duration}
+                setDuration={setDuration}
+            />
+            <FloorPlan
+                guests={guests}
+                date={date}
+                hour={hour}
+                duration={duration}
+            />
         </div>
     );
 }

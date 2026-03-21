@@ -1,7 +1,6 @@
-import {useEffect, useRef, useState} from "react";
-import {drawTable} from "../utils/tableDrawing";
-
-import {getTables} from "../api/tableApi";
+import { useEffect, useRef, useState } from "react";
+import { drawTable } from "../utils/tableDrawing";
+import { getTables } from "../api/tableApi";
 
 import {
     TABLE_WIDTH,
@@ -9,23 +8,40 @@ import {
     TABLE_HEIGHT_LARGE
 } from "../utils/tableConstants";
 
-function FloorPlan({ guests }) {
+function FloorPlan({ guests, date, hour, duration }) {
     const canvasRef = useRef(null);
 
     const [tables, setTables] = useState([]);
     const [selectedTableId, setSelectedTableId] = useState(null);
 
     const tableLayout = {
-        1: {x: 50, y: 450},
-        2: {x: 300, y: 450},
-        3: {x: 600, y: 450},
-        4: {x: 50, y: 50},
-        5: {x: 300, y: 50},
-        6: {x: 600, y: 50},
+        1: { x: 50, y: 450 },
+        2: { x: 300, y: 450 },
+        3: { x: 600, y: 450 },
+        4: { x: 50, y: 50 },
+        5: { x: 300, y: 50 },
+        6: { x: 600, y: 50 },
     };
 
+    function buildDateTimes() {
+        if (!date || hour === "") return {};
+
+        const start = new Date(date);
+        start.setHours(hour, 0, 0, 0);
+
+        const end = new Date(start);
+        end.setHours(start.getHours() + duration);
+
+        return {
+            start: start.toISOString(),
+            end: end.toISOString(),
+        };
+    }
+
     useEffect(() => {
-        getTables({guests})
+        const { start, end } = buildDateTimes();
+
+        getTables({ start, end, guests })
             .then(data => {
                 const tablesWithLayout = data
                     .map(t => ({
@@ -45,15 +61,11 @@ function FloorPlan({ guests }) {
                 } else {
                     const firstSelectable = tablesWithLayout.find(t => t.selectable);
 
-                    if (firstSelectable) {
-                        setSelectedTableId(firstSelectable.id);
-                    } else {
-                        setSelectedTableId(null);
-                    }
+                    setSelectedTableId(firstSelectable ? firstSelectable.id : null);
                 }
             })
             .catch(err => console.error("Failed to fetch tables:", err));
-    }, [guests]);
+    }, [guests, date, hour, duration]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
