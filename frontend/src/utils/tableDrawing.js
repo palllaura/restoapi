@@ -5,16 +5,21 @@ import {
     CHAIR_SIZE
 } from "./tableConstants";
 
-export function drawTable(ctx, x, y, seats, status) {
+export function drawTable(ctx, x, y, seats, status, selectable) {
+
+    const isDisabled = !selectable;
+
     const tableColor =
-        status === "OCCUPIED"
-            ? "#ffffff"
+        isDisabled
+            ? "#f5f5f5"
             : status === "RECOMMENDED"
                 ? "#d9edbb"
-                : "#eae6e1";
+                : status === "OCCUPIED"
+                    ? "#ffffff"
+                    : "#eae6e1";
 
     const strokeColor =
-        status === "OCCUPIED"
+        isDisabled
             ? "#d5d5d5"
             : "#090909";
 
@@ -28,7 +33,8 @@ export function drawTable(ctx, x, y, seats, status) {
         drawChair(
             ctx,
             x + TABLE_WIDTH / 2 - CHAIR_SIZE / 2,
-            y - CHAIR_SIZE / 2
+            y - CHAIR_SIZE / 2,
+            isDisabled
         );
     }
 
@@ -36,7 +42,8 @@ export function drawTable(ctx, x, y, seats, status) {
         drawChair(
             ctx,
             x + TABLE_WIDTH / 2 - CHAIR_SIZE / 2,
-            y + tableHeight - CHAIR_SIZE / 2
+            y + tableHeight - CHAIR_SIZE / 2,
+            isDisabled
         );
     }
 
@@ -44,7 +51,8 @@ export function drawTable(ctx, x, y, seats, status) {
         drawChair(
             ctx,
             x - CHAIR_SIZE / 2,
-            y + tableHeight / 2 - CHAIR_SIZE / 2
+            y + tableHeight / 2 - CHAIR_SIZE / 2,
+            isDisabled
         );
     }
 
@@ -52,7 +60,8 @@ export function drawTable(ctx, x, y, seats, status) {
         drawChair(
             ctx,
             x + TABLE_WIDTH - CHAIR_SIZE / 2,
-            y + tableHeight / 2 - CHAIR_SIZE / 2
+            y + tableHeight / 2 - CHAIR_SIZE / 2,
+            isDisabled
         );
     }
 
@@ -60,25 +69,29 @@ export function drawTable(ctx, x, y, seats, status) {
         drawChair(
             ctx,
             x - CHAIR_SIZE / 2,
-            y + tableHeight / 4 - CHAIR_SIZE / 2
+            y + tableHeight / 4 - CHAIR_SIZE / 2,
+            isDisabled
         );
 
         drawChair(
             ctx,
             x - CHAIR_SIZE / 2,
-            y + (3 * tableHeight) / 4 - CHAIR_SIZE / 2
+            y + (3 * tableHeight) / 4 - CHAIR_SIZE / 2,
+            isDisabled
         );
 
         drawChair(
             ctx,
             x + TABLE_WIDTH - CHAIR_SIZE / 2,
-            y + tableHeight / 4 - CHAIR_SIZE / 2
+            y + tableHeight / 4 - CHAIR_SIZE / 2,
+            isDisabled
         );
 
         drawChair(
             ctx,
             x + TABLE_WIDTH - CHAIR_SIZE / 2,
-            y + (3 * tableHeight) / 4 - CHAIR_SIZE / 2
+            y + (3 * tableHeight) / 4 - CHAIR_SIZE / 2,
+            isDisabled
         );
     }
 
@@ -88,7 +101,10 @@ export function drawTable(ctx, x, y, seats, status) {
     ctx.stroke();
 }
 
-function drawChair(ctx, x, y) {
+function drawChair(ctx, x, y, isDisabled) {
+    ctx.fillStyle = isDisabled ? "#f5f5f5" : ctx.fillStyle;
+    ctx.strokeStyle = isDisabled ? "#d5d5d5" : ctx.strokeStyle;
+
     ctx.beginPath();
     ctx.rect(x, y, CHAIR_SIZE, CHAIR_SIZE);
     ctx.fill();

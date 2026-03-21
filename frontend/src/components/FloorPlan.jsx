@@ -42,8 +42,14 @@ function FloorPlan() {
 
                 if (recommended) {
                     setSelectedTableId(recommended.id);
-                } else if (tablesWithLayout.length > 0) {
-                    setSelectedTableId(tablesWithLayout[0].id);
+                } else {
+                    const firstSelectable = tablesWithLayout.find(t => t.selectable);
+
+                    if (firstSelectable) {
+                        setSelectedTableId(firstSelectable.id);
+                    } else {
+                        setSelectedTableId(null);
+                    }
                 }
             })
             .catch(err => console.error("Failed to fetch tables:", err));
@@ -51,6 +57,8 @@ function FloorPlan() {
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const ctx = canvas.getContext("2d");
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -58,12 +66,13 @@ function FloorPlan() {
         tables.forEach(t => {
             const resolvedStatus = resolveTableStatus(t, selectedTableId);
 
-            drawTable(ctx, t.x, t.y, t.seats, resolvedStatus);
+            drawTable(ctx, t.x, t.y, t.seats, resolvedStatus, t.selectable);
         });
     }, [tables, selectedTableId]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
 
         const handleClick = (event) => {
             const rect = canvas.getBoundingClientRect();
@@ -75,7 +84,7 @@ function FloorPlan() {
                 isPointInsideTable(clickX, clickY, t)
             );
 
-            if (clickedTable && clickedTable.status !== "OCCUPIED") {
+            if (clickedTable && clickedTable.selectable) {
                 setSelectedTableId(clickedTable.id);
             }
         };
