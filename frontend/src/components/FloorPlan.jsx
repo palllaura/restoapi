@@ -8,7 +8,7 @@ import {
     TABLE_HEIGHT_LARGE
 } from "../utils/tableConstants";
 
-function FloorPlan({ guests, date, hour, duration, selectedTableId, setSelectedTableId }) {
+function FloorPlan({ guests, date, hour, duration, selectedTableId, setSelectedTableId, refreshKey }) {
     const canvasRef = useRef(null);
 
     const [tables, setTables] = useState([]);
@@ -64,7 +64,7 @@ function FloorPlan({ guests, date, hour, duration, selectedTableId, setSelectedT
                 }
             })
             .catch(err => console.error("Failed to fetch tables:", err));
-    }, [guests, date, hour, duration]);
+    }, [guests, date, hour, duration, refreshKey]);
 
     useEffect(() => {
         const canvas = canvasRef.current;

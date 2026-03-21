@@ -5,6 +5,7 @@ import FloorPlan from "./components/FloorPlan";
 function App() {
 
     const [selectedTableId, setSelectedTableId] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const [guests, setGuests] = useState(2);
     const [date, setDate] = useState("");
@@ -23,6 +24,7 @@ function App() {
                 duration={duration}
                 setDuration={setDuration}
                 selectedTableId={selectedTableId}
+                onReservationSuccess={() => setRefreshKey(k => k + 1)}
             />
             <FloorPlan
                 guests={guests}
@@ -31,6 +33,7 @@ function App() {
                 duration={duration}
                 selectedTableId={selectedTableId}
                 setSelectedTableId={setSelectedTableId}
+                refreshKey={refreshKey}
             />
         </div>
     );

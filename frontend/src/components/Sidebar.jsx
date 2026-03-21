@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import logo from "../assets/logo.png";
-import { createReservation } from "../api/reservationApi";
+import {createReservation} from "../api/reservationApi";
 
 function Sidebar({
                      guests,
@@ -11,7 +11,8 @@ function Sidebar({
                      setHour,
                      duration,
                      setDuration,
-                     selectedTableId
+                     selectedTableId,
+                     onReservationSuccess
                  }) {
 
     const [name, setName] = useState("");
@@ -73,6 +74,9 @@ function Sidebar({
         })
             .then(res => {
                 setMessage(res.message);
+                if (res.success) {
+                    onReservationSuccess();
+                }
             })
             .catch(() => {
                 setMessage("Midagi läks valesti");
@@ -81,7 +85,7 @@ function Sidebar({
 
     useEffect(() => {
         setMessage(null);
-    }, [guests, date, hour, duration, name, selectedTableId]);
+    }, [guests, date, hour, duration, name]);
 
     useEffect(() => {
         if (hour && duration > (CLOSING_HOUR - hour)) {
@@ -98,14 +102,14 @@ function Sidebar({
                 boxSizing: "border-box",
             }}
         >
-            <div style={{ marginBottom: "40px" }}>
-                <img src={logo} alt="logo" style={{ width: "100%" }} />
+            <div style={{marginBottom: "40px"}}>
+                <img src={logo} alt="logo" style={{width: "100%"}}/>
             </div>
 
             <div>
-                <p style={{ marginTop: "20px" }}>Kuupäev ja kellaaeg</p>
+                <p style={{marginTop: "20px"}}>Kuupäev ja kellaaeg</p>
 
-                <div style={{ display: "flex", gap: "10px" }}>
+                <div style={{display: "flex", gap: "10px"}}>
                     <input
                         type="date"
                         value={date}
@@ -127,9 +131,9 @@ function Sidebar({
                     </select>
                 </div>
 
-                <p style={{ marginTop: "20px" }}>Külastuse kestus</p>
+                <p style={{marginTop: "20px"}}>Külastuse kestus</p>
 
-                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
                     <button
                         onClick={() => setDuration(d => Math.max(MIN_DURATION, d - 1))}
                         disabled={duration === MIN_DURATION}
@@ -147,9 +151,9 @@ function Sidebar({
                     </button>
                 </div>
 
-                <p style={{ marginTop: "20px" }}>Külastajate arv</p>
+                <p style={{marginTop: "20px"}}>Külastajate arv</p>
 
-                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <div style={{display: "flex", gap: "10px", alignItems: "center"}}>
                     <button onClick={decreaseGuests} disabled={guests === 1}>
                         -
                     </button>
@@ -162,18 +166,18 @@ function Sidebar({
                 </div>
 
                 <div>
-                    <p style={{ marginTop: "20px" }}>Nimi</p>
+                    <p style={{marginTop: "20px"}}>Nimi</p>
                     <input
                         type="text"
                         value={name}
                         placeholder="..."
                         onChange={e => setName(e.target.value)}
-                        style={{ width: "100%" }}
+                        style={{width: "100%"}}
                     />
                 </div>
 
                 <button
-                    style={{ marginTop: "30px", width: "100%" }}
+                    style={{marginTop: "30px", width: "100%"}}
                     onClick={handleReserve}
                     disabled={!selectedTableId}
                 >
@@ -181,7 +185,7 @@ function Sidebar({
                 </button>
 
                 {message && (
-                    <p style={{ marginTop: "15px" }}>
+                    <p style={{marginTop: "15px"}}>
                         {message}
                     </p>
                 )}
