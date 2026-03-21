@@ -7,6 +7,7 @@ import com.restoapi.repository.DiningTableRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -51,13 +52,15 @@ public class DiningTableService {
                 ? 2
                 : guests;
 
-        return tableRepository.findAll().stream()
+        List<TableDto> dtos = tableRepository.findAll().stream()
                 .map(table -> new TableDto(
                         table.getId(),
                         table.getSeats(),
                         resolveStatus(table, startTime, endTime)
                 ))
                 .toList();
+
+        return markRecommended(dtos, partySize);
     }
 
     /**
@@ -77,5 +80,34 @@ public class DiningTableService {
         return available
                 ? TableStatus.FREE
                 : TableStatus.OCCUPIED;
+    }
+
+    /**
+     * Marks the most suitable table as recommended if at least one suitable table exists.
+     * @param tables list of tables.
+     * @param partySize number of guests.
+     * @return list of tables as dtos.
+     */
+    private List<TableDto> markRecommended(List<TableDto> tables, int partySize) {
+
+        TableDto best = tables.stream()
+                .filter(t -> t.status() == TableStatus.FREE)
+                .filter(t -> t.seats() >= partySize)
+                .min(Comparator.comparingInt(TableDto::seats))
+                .orElse(null);
+
+        if (best == null) {
+            return tables;
+        }
+
+        return tables.stream()
+                .map(t -> new TableDto(
+                        t.id(),
+                        t.seats(),
+                        t.id().equals(best.id())
+                                ? TableStatus.RECOMMENDED
+                                : t.status()
+                ))
+                .toList();
     }
 }

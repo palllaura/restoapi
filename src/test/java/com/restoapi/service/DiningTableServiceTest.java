@@ -65,53 +65,115 @@ class DiningTableServiceTest {
     }
 
     @Test
-    void shouldReturnAllTables() {
+    void shouldMapTablesWithCorrectStatusesWithoutRecommendation() {
+        when(repository.findAll()).thenReturn(List.of(table2, table4));
+
+        when(reservationService.isTableAvailable(eq(table2), any(), any()))
+                .thenReturn(true);
+
+        when(reservationService.isTableAvailable(eq(table4), any(), any()))
+                .thenReturn(false);
+
+        List<TableDto> result = service.getTables(null, null, 5);
+
+        assertEquals(TableStatus.FREE, result.get(0).status());
+        assertEquals(TableStatus.OCCUPIED, result.get(1).status());
+    }
+
+    @Test
+    void shouldMarkBestFreeTableAsRecommended() {
         when(repository.findAll()).thenReturn(List.of(table2, table4, table6));
 
         when(reservationService.isTableAvailable(any(), any(), any()))
                 .thenReturn(true);
 
-        List<TableDto> result = service.getTables(null, null, null);
+        List<TableDto> result = service.getTables(null, null, 3);
 
-        assertEquals(3, result.size());
+        TableDto table2Dto = result.get(0);
+        TableDto table4Dto = result.get(1);
+        TableDto table6Dto = result.get(2);
+
+        assertEquals(TableStatus.FREE, table2Dto.status());
+        assertEquals(TableStatus.RECOMMENDED, table4Dto.status());
+        assertEquals(TableStatus.FREE, table6Dto.status());
     }
 
     @Test
-    void shouldMapTablesToDtosCorrectly() {
-        when(repository.findAll()).thenReturn(List.of(table4));
+    void shouldRecommendSmallestSuitableFreeTable() {
+        when(repository.findAll()).thenReturn(List.of(table2, table4, table6));
         when(reservationService.isTableAvailable(any(), any(), any()))
                 .thenReturn(true);
 
-        List<TableDto> result = service.getTables(null, null, null);
-        TableDto dto = result.getFirst();
+        List<TableDto> result = service.getTables(null, null, 4);
 
-        assertEquals(table4.getId(), dto.id());
-        assertEquals(table4.getSeats(), dto.seats());
-        assertEquals(TableStatus.FREE, dto.status());
+        TableDto recommended = result.stream()
+                .filter(t -> t.status() == TableStatus.RECOMMENDED)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(recommended);
+        assertEquals(4, recommended.seats());
     }
 
     @Test
-    void shouldReturnOccupiedWhenTableIsNotAvailable() {
+    void shouldNotRecommendTooSmallTables() {
+        when(repository.findAll()).thenReturn(List.of(table2, table4));
+
+        when(reservationService.isTableAvailable(any(), any(), any()))
+                .thenReturn(true);
+
+        List<TableDto> result = service.getTables(null, null, 4);
+
+        assertTrue(result.stream()
+                .filter(t -> t.seats() == 2)
+                .noneMatch(t -> t.status() == TableStatus.RECOMMENDED));
+    }
+
+    @Test
+    void shouldNotRecommendOccupiedTables() {
+        when(repository.findAll()).thenReturn(List.of(table4, table6));
+
+        when(reservationService.isTableAvailable(eq(table4), any(), any()))
+                .thenReturn(false);
+
+        when(reservationService.isTableAvailable(eq(table6), any(), any()))
+                .thenReturn(true);
+
+        List<TableDto> result = service.getTables(null, null, 4);
+
+        TableDto recommended = result.stream()
+                .filter(t -> t.status() == TableStatus.RECOMMENDED)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(recommended);
+        assertEquals(6, recommended.seats());
+    }
+
+    @Test
+    void shouldReturnNoRecommendedIfNoSuitableTables() {
         when(repository.findAll()).thenReturn(List.of(table2));
+
+        when(reservationService.isTableAvailable(any(), any(), any()))
+                .thenReturn(true);
+
+        List<TableDto> result = service.getTables(null, null, 4);
+
+        assertTrue(result.stream()
+                .noneMatch(t -> t.status() == TableStatus.RECOMMENDED));
+    }
+
+    @Test
+    void shouldReturnNoRecommendedIfAllTablesOccupied() {
+        when(repository.findAll()).thenReturn(List.of(table4, table6));
 
         when(reservationService.isTableAvailable(any(), any(), any()))
                 .thenReturn(false);
 
-        List<TableDto> result = service.getTables(null, null, null);
+        List<TableDto> result = service.getTables(null, null, 4);
 
-        assertEquals(TableStatus.OCCUPIED, result.getFirst().status());
-    }
-
-    @Test
-    void shouldReturnFreeWhenTableIsAvailable() {
-        when(repository.findAll()).thenReturn(List.of(table2));
-
-        when(reservationService.isTableAvailable(any(), any(), any()))
-                .thenReturn(true);
-
-        List<TableDto> result = service.getTables(null, null, null);
-
-        assertEquals(TableStatus.FREE, result.getFirst().status());
+        assertTrue(result.stream()
+                .noneMatch(t -> t.status() == TableStatus.RECOMMENDED));
     }
 
     @Test
@@ -124,7 +186,7 @@ class DiningTableServiceTest {
         when(reservationService.isTableAvailable(any(), any(), any()))
                 .thenReturn(true);
 
-        service.getTables(start, end, 4);
+        service.getTables(start, end, 2);
 
         verify(reservationService, times(1))
                 .isTableAvailable(table2, start, end);
