@@ -53,18 +53,37 @@ public class DiningTableService {
                 : guests;
 
         List<TableDto> dtos = tableRepository.findAll().stream()
-                .map(table -> new TableDto(
-                        table.getId(),
-                        table.getSeats(),
-                        resolveStatus(table, startTime, endTime)
-                ))
+                .map(table -> mapToDto(table, startTime, endTime, partySize))
                 .toList();
 
-        return markRecommended(dtos, partySize);
+        return markRecommended(dtos);
     }
 
     /**
-     * Determines table status.
+     * Maps DiningTable to TableDto including selectable logic.
+     */
+    private TableDto mapToDto(
+            DiningTable table,
+            LocalDateTime start,
+            LocalDateTime end,
+            int partySize
+    ) {
+        TableStatus status = resolveStatus(table, start, end);
+
+        boolean selectable =
+                status == TableStatus.FREE &&
+                        table.getSeats() >= partySize;
+
+        return new TableDto(
+                table.getId(),
+                table.getSeats(),
+                status,
+                selectable
+        );
+    }
+
+    /**
+     * Determines table status based on reservation availability.
      */
     private TableStatus resolveStatus(
             DiningTable table,
@@ -84,15 +103,14 @@ public class DiningTableService {
 
     /**
      * Marks the most suitable table as recommended if at least one suitable table exists.
+     *
      * @param tables list of tables.
-     * @param partySize number of guests.
      * @return list of tables as dtos.
      */
-    private List<TableDto> markRecommended(List<TableDto> tables, int partySize) {
+    private List<TableDto> markRecommended(List<TableDto> tables) {
 
         TableDto best = tables.stream()
-                .filter(t -> t.status() == TableStatus.FREE)
-                .filter(t -> t.seats() >= partySize)
+                .filter(TableDto::selectable)
                 .min(Comparator.comparingInt(TableDto::seats))
                 .orElse(null);
 
@@ -106,7 +124,8 @@ public class DiningTableService {
                         t.seats(),
                         t.id().equals(best.id())
                                 ? TableStatus.RECOMMENDED
-                                : t.status()
+                                : t.status(),
+                        t.selectable()
                 ))
                 .toList();
     }

@@ -7,9 +7,11 @@ import com.restoapi.enums.TableStatus;
  * @param id unique id of table.
  * @param seats number of seats.
  * @param status table status.
+ * @param selectable is table selectable for reservation.
  */
 public record TableDto(
         Long id,
         int seats,
-        TableStatus status
+        TableStatus status,
+        boolean selectable
 ) {}

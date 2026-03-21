@@ -202,4 +202,40 @@ class DiningTableServiceTest {
 
         assertEquals(2, table2.getSeats());
     }
+
+    @Test
+    void shouldMarkTableSelectableWhenFreeAndBigEnough() {
+        when(repository.findAll()).thenReturn(List.of(table4));
+
+        when(reservationService.isTableAvailable(any(), any(), any()))
+                .thenReturn(true);
+
+        List<TableDto> result = service.getTables(null, null, 3);
+
+        assertTrue(result.getFirst().selectable());
+    }
+
+    @Test
+    void shouldNotBeSelectableWhenTableTooSmall() {
+        when(repository.findAll()).thenReturn(List.of(table2));
+
+        when(reservationService.isTableAvailable(any(), any(), any()))
+                .thenReturn(true);
+
+        List<TableDto> result = service.getTables(null, null, 4);
+
+        assertFalse(result.getFirst().selectable());
+    }
+
+    @Test
+    void shouldNotBeSelectableWhenTableOccupied() {
+        when(repository.findAll()).thenReturn(List.of(table6));
+
+        when(reservationService.isTableAvailable(any(), any(), any()))
+                .thenReturn(false);
+
+        List<TableDto> result = service.getTables(null, null, 4);
+
+        assertFalse(result.getFirst().selectable());
+    }
 }
