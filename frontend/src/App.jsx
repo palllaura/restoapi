@@ -4,6 +4,8 @@ import FloorPlan from "./components/FloorPlan";
 
 function App() {
 
+    const [selectedTableId, setSelectedTableId] = useState(null);
+
     const [guests, setGuests] = useState(2);
     const [date, setDate] = useState("");
     const [hour, setHour] = useState("");
@@ -20,12 +22,15 @@ function App() {
                 setHour={setHour}
                 duration={duration}
                 setDuration={setDuration}
+                selectedTableId={selectedTableId}
             />
             <FloorPlan
                 guests={guests}
                 date={date}
                 hour={hour}
                 duration={duration}
+                selectedTableId={selectedTableId}
+                setSelectedTableId={setSelectedTableId}
             />
         </div>
     );

@@ -8,11 +8,10 @@ import {
     TABLE_HEIGHT_LARGE
 } from "../utils/tableConstants";
 
-function FloorPlan({ guests, date, hour, duration }) {
+function FloorPlan({ guests, date, hour, duration, selectedTableId, setSelectedTableId }) {
     const canvasRef = useRef(null);
 
     const [tables, setTables] = useState([]);
-    const [selectedTableId, setSelectedTableId] = useState(null);
 
     const tableLayout = {
         1: { x: 50, y: 450 },

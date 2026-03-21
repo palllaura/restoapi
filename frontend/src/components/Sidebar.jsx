@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
+import { createReservation } from "../api/reservationApi";
 
 function Sidebar({
                      guests,
@@ -9,8 +10,11 @@ function Sidebar({
                      hour,
                      setHour,
                      duration,
-                     setDuration
+                     setDuration,
+                     selectedTableId
                  }) {
+
+    const [name, setName] = useState("");
 
     const OPENING_HOUR = 10;
     const CLOSING_HOUR = 22;
@@ -45,6 +49,34 @@ function Sidebar({
         ? Math.min(MAX_DURATION, CLOSING_HOUR - hour)
         : MAX_DURATION;
 
+    function handleReserve() {
+        if (!selectedTableId || !date || hour === "" || !name.trim()) {
+            alert("Palun täida kõik väljad");
+            return;
+        }
+
+        const start = new Date(date);
+        start.setHours(hour, 0, 0, 0);
+
+        const end = new Date(start);
+        end.setHours(start.getHours() + duration);
+
+        createReservation({
+            tableId: selectedTableId,
+            start: start.toISOString(),
+            end: end.toISOString(),
+            guests,
+            customerName: name,
+        })
+            .then(() => {
+                alert("Broneering tehtud!");
+                setName("");
+            })
+            .catch(() => {
+                alert("Broneerimine ebaõnnestus");
+            });
+    }
+
     useEffect(() => {
         if (hour && duration > (CLOSING_HOUR - hour)) {
             setDuration(Math.min(MAX_DURATION, CLOSING_HOUR - hour));
@@ -65,7 +97,7 @@ function Sidebar({
             </div>
 
             <div>
-                <p>Kuupäev ja kellaaeg</p>
+                <p style={{ marginTop: "20px" }}>Kuupäev ja kellaaeg</p>
 
                 <div style={{ display: "flex", gap: "10px" }}>
                     <input
@@ -123,7 +155,22 @@ function Sidebar({
                     </button>
                 </div>
 
-                <button style={{ marginTop: "30px", width: "100%" }}>
+                <div>
+                    <p style={{ marginTop: "20px" }}>Nimi</p>
+                    <input
+                        type="text"
+                        value={name}
+                        placeholder="..."
+                        onChange={e => setName(e.target.value)}
+                        style={{ width: "100%" }}
+                    />
+                </div>
+
+                <button
+                    style={{ marginTop: "30px", width: "100%" }}
+                    onClick={handleReserve}
+                    disabled={!selectedTableId}
+                >
                     Reserveeri
                 </button>
             </div>
