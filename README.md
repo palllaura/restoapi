@@ -3,8 +3,10 @@ Simple restaurant table reservation and recommendation system.
 
 ## Features
 * View restaurant plan with all tables
-* Filter available tables by date, time and number of guests
-* Get a recommended table based on party size and preferences
+* Filter tables by date, time, duration and number of guests
+* Real-time table availability based on reservations
+* Automatic table recommendation (best fit for party size)
+* Create reservations with validation and feedback
 
 ## Tech stack
 ### Backend
@@ -16,6 +18,7 @@ Simple restaurant table reservation and recommendation system.
 ### Frontend
 * React
 * HTML5 Canvas for restaurant layout visualization
+* CSS
 
 ## Prerequisites
 * Java 25
@@ -57,7 +60,26 @@ Simple restaurant table reservation and recommendation system.
 The database starts automatically when the backend application runs.
 H2 console will be available at: http://localhost:8080/h2-console
 
-## Notes
+## Assumptions
+* Only full-hour bookings (no minute precision)
+* Fixed table layout (no dynamic positioning)
+* Recommendation is based only on table size (no user preferences yet)
+* Opening hours: 10:00–22:00
+* Reservations: 1–3h, up to 3 days ahead
 
-* The restaurant layout and initial reservations are generated automatically for demonstration purposes.
-* This project focuses on core functionality and a simple recommendation algorithm.
+## Notes
+* Overlapping reservations are prevented
+* Tables are marked as FREE / OCCUPIED / RECOMMENDED
+* Demo data is generated automatically
+
+## Future plans
+* Table zones (terrace, indoor, private room)
+* User preferences (window, quiet area, etc.)
+* Smarter recommendation algorithm (scoring system)
+* Combine tables for large groups
+* Edit / cancel reservations
+* Admin view for managing layout
+* Docker support
+
+## Screenshot
+![restoapi](screenshots/restoapi.png)
